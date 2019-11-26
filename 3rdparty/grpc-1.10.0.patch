@@ -86,3 +86,15 @@ index 83f642a675..8e2253fb39 100644
 -- 
 2.17.2 (Apple Git-113)
 
+--- a/src/core/lib/gpr/log_linux.cc
++++ b/src/core/lib/gpr/log_linux.cc
+@@ -39,7 +39,9 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
++#ifndef HAVE_GETTID
+ static long gettid(void) { return syscall(__NR_gettid); }
++#endif
+ 
+ void gpr_log(const char* file, int line, gpr_log_severity severity,
+              const char* format, ...) {

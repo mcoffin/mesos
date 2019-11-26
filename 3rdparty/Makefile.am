@@ -503,6 +503,12 @@ LIB_GRPC = $(GRPC)/libs/opt/libgrpc++$(GRPC_VARIANT).a	\
 
 $(LIB_GRPC): $(GRPC)-build-stamp
 
+if HAVE_GETTID
+GRPC_DEFINES = -DHAVE_GETTID=1
+else
+GRPC_DEFINES =
+endif
+
 # NOTE: We pass compiler flags through environment variables rather than the
 # command line because gRPC uses target-specific assignments to append compiler
 # flags, which will be overwritten by the command line. See:
@@ -517,18 +523,19 @@ $(LIB_GRPC): $(GRPC)-build-stamp
 # and set up proper include and linker flags instead.
 $(GRPC)-build-stamp: $(GRPC)-stamp			\
                      $(PROTOBUF)-build-stamp
+	echo GRPC_DEFINES: $(GRPC_DEFINES)
 	cd $(GRPC) &&					\
 	  CPPFLAGS="$(PROTOBUF_INCLUDE_FLAGS)		\
 	            $(SSL_INCLUDE_FLAGS)		\
 	            $(ZLIB_INCLUDE_FLAGS)		\
 	            $(CPPFLAGS)"			\
-	  CFLAGS="$(CFLAGS)"				\
-	  CXXFLAGS="$(CXXFLAGS)"			\
+	  CFLAGS="$(CFLAGS)"		\
+	  CXXFLAGS="$(CXXFLAGS)"	\
 	  $(MAKE) $(AM_MAKEFLAGS)			\
 	    $(LIB_GRPC:%=$(realpath $(abs_builddir))/%)	\
 	    CC="$(CC)"					\
 	    CXX="$(CXX)"				\
-	    EXTRA_CPPFLAGS=-Wno-error			\
+	    EXTRA_CPPFLAGS="-Wno-error $(GRPC_DEFINES)"	\
 	    LD="$(CC)"					\
 	    LDXX="$(CXX)"				\
 	    LDFLAGS="$(PROTOBUF_LINKER_FLAGS)		\

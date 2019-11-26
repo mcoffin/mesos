@@ -2883,6 +2883,8 @@ AS_IF([test -f ${srcdir}/${git_config} || test -f ${git_config}], [AC_MSG_RESULT
   AC_CONFIG_FILES([${git_config}])
 ])
 
+AC_CHECK_FUNCS([gettid], [have_gettid=true], [have_gettid=false])
+AM_CONDITIONAL(HAVE_GETTID, $have_gettid)
 
 AC_OUTPUT
 
